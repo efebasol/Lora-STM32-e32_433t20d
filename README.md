@@ -107,7 +107,6 @@ The following enums are used to define configuration options cleanly:
 - Add GPIO control for M0/M1 mode selection
 - Support configuration reading (readback)
 - Add compatibility for E22 or SPI-based LoRa modules
-- Optional error handling with `HAL_StatusTypeDef` return value
 
 ---
 
@@ -128,5 +127,5 @@ MIT License. Free to use, modify, and distribute.
 
 ## ✨ Credits
 
-Developed by **[Your Name or GitHub Handle]**  
+Developed by **Efe BASOL**  
 Inspired by the EBYTE documentation and STM32 HAL UART usage.
