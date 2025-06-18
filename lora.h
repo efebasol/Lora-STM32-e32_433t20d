@@ -6,82 +6,76 @@
 // Serial check digit
 typedef enum
 {
-    serialPortMode_8N1 = (0x00 << 0x06), // Default
-    serialPortMode_801 = (0x01 << 0x06),
-    serialPortMode_8E1 = (0x02 << 0x06)
+    serialPortMode_8N1              = (0x00 << 0x06), // Default
+    serialPortMode_801              = (0x01 << 0x06),
+    serialPortMode_8E1              = (0x02 << 0x06)
 } serialPortMode_t;
 
 // TTL serial port rate (bps)
 typedef enum
 {
-    baudRate_1200 = (0x00 << 0x03),
-    baudRate_2400 = (0x01 << 0x03),
-    baudRate_4800 = (0x02 << 0x03),
-    baudRate_9600 = (0x03 << 0x03), // Default
-    baudRate_19200 = (0x04 << 0x03),
-    baudRate_38400 = (0x05 << 0x03),
-    baudRate_57600 = (0x06 << 0x03),
-    baudRate_116200 = (0x07 << 0x03)
+    baudRate_1200                   = (0x00 << 0x03),
+    baudRate_2400                   = (0x01 << 0x03),
+    baudRate_4800                   = (0x02 << 0x03),
+    baudRate_9600                   = (0x03 << 0x03), // Default
+    baudRate_19200                  = (0x04 << 0x03),
+    baudRate_38400                  = (0x05 << 0x03),
+    baudRate_57600                  = (0x06 << 0x03),
+    baudRate_116200                 = (0x07 << 0x03)
 } baudRate_t;
 
 // Common Wireless Air Rate (bps)
 typedef enum
 {
-    airRate_03K = (0x00 << 0x00),
-    airRate_12K = (0x01 << 0x00),
-    airRate_24K = (0x02 << 0x00), // Default
-    airRate_48K = (0x03 << 0x00),
-    airRate_96K = (0x04 << 0x00),
-    airRate_192K = (0x05 << 0x00)
+    airRate_03K                     = (0x00 << 0x00),
+    airRate_12K                     = (0x01 << 0x00),
+    airRate_24K                     = (0x02 << 0x00), // Default
+    airRate_48K                     = (0x03 << 0x00),
+    airRate_96K                     = (0x04 << 0x00),
+    airRate_192K                    = (0x05 << 0x00)
 } airRate_t;
-
-/*
- *
- *   Option parameter
- *
- */
 
 // Fixed-point transmit enable bit (like MODBUS)
 typedef enum
 {
-    transmissionMode_Transparent = (0x00 << 0x07),
-    transmissionMode_Fixed = (0x01 << 0x07)
+    transmissionMode_Transparent    = (0x00 << 0x07),
+    transmissionMode_Fixed          = (0x01 << 0x07)
 } transmissionMode_t;
 
 // IO drive mode
 typedef enum
 {
-    IODriveMode_PushPull = (0x00 << 0x06),
-    IODriveMode_OpenCircuit = (0x01 << 0x06) // Default
+    IODriveMode_PushPull            = (0x00 << 0x06),
+    IODriveMode_OpenCircuit         = (0x01 << 0x06) // Default
 } IODriveMode_t;
 
 // Wireless wake-up time
 typedef enum
 {
-    wakeUpTime_250ms = (0x00 << 0x03), // Default
-    wakeUpTime_500ms = (0x01 << 0x03),
-    wakeUpTime_750ms = (0x02 << 0x03),
-    wakeUpTime_1000ms = (0x03 << 0x03),
-    wakeUpTime_1250ms = (0x04 << 0x03),
-    wakeUpTime_1500ms = (0x05 << 0x03),
-    wakeUpTime_1750ms = (0x06 << 0x03),
-    wakeUpTime_2000ms = (0x07 << 0x03)
+    wakeUpTime_250ms                = (0x00 << 0x03), // Default
+    wakeUpTime_500ms                = (0x01 << 0x03),
+    wakeUpTime_750ms                = (0x02 << 0x03),
+    wakeUpTime_1000ms               = (0x03 << 0x03),
+    wakeUpTime_1250ms               = (0x04 << 0x03),
+    wakeUpTime_1500ms               = (0x05 << 0x03),
+    wakeUpTime_1750ms               = (0x06 << 0x03),
+    wakeUpTime_2000ms               = (0x07 << 0x03)
 } wakeUpTime_t;
 
 // FEC switch
 typedef enum
 {
-    FECswitch_off = (0x00 << 0x02),
-    FECswitch_on = (0x01 << 0x02) // Default
+    FECswitch_off                   = (0x00 << 0x02),
+    FECswitch_on                    = (0x01 << 0x02) // Default
 } FECswitch_t;
 
 // Transmit power
 typedef enum
 {
-    transmitPower_20dBm = (0x00 << 0x00), // Default
-    transmitPower_17dBm = (0x01 << 0x00),
-    transmitPower_14dBm = (0x02 << 0x00),
-    transmitPower_10dBm = (0x04 << 0x00)
+    transmitPower_20dBm             = (0x00 << 0x00), // Default
+    transmitPower_17dBm             = (0x01 << 0x00),
+    transmitPower_14dBm             = (0x02 << 0x00),
+    transmitPower_10dBm             = (0x04 << 0x00)
 } transmitPower_t;
 
 typedef struct
