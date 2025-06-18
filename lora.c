@@ -4,7 +4,7 @@ static uint8_t mainParameter[6] = {0};
 
 HAL_StatusTypeDef Lora_applyConfig(UART_HandleTypeDef *huart, LoraConfig_t *config)
 {
-    mainParameter[0] = 0xC0|
+    mainParameter[0] = 0xC0;
     mainParameter[1] = config->ADDH;
     mainParameter[2] = config->ADDL;
     mainParameter[3] = config->serialPortMode | config->baudRate | config->airRate;
