@@ -8,7 +8,7 @@ typedef enum
 {
     // Default
     serialPortMode_8N1 = (0x00 << 0x06),
-    serialPortMode_801 = (0x01 << 0x06),
+    serialPortMode_8O1 = (0x01 << 0x06),
     serialPortMode_8E1 = (0x02 << 0x06)
 } serialPortMode_t;
 
@@ -23,7 +23,7 @@ typedef enum
     baudRate_19200 = (0x04 << 0x03),
     baudRate_38400 = (0x05 << 0x03),
     baudRate_57600 = (0x06 << 0x03),
-    baudRate_116200 = (0x07 << 0x03)
+    baudRate_115200 = (0x07 << 0x03)
 } baudRate_t;
 
 // Common Wireless Air Rate (bps)
@@ -82,7 +82,7 @@ typedef enum
     transmitPower_20dBm = (0x00 << 0x00),
     transmitPower_17dBm = (0x01 << 0x00),
     transmitPower_14dBm = (0x02 << 0x00),
-    transmitPower_10dBm = (0x04 << 0x00)
+    transmitPower_10dBm = (0x03 << 0x00)
 } transmitPower_t;
 
 typedef struct
