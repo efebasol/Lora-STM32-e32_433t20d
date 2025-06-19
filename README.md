@@ -1,31 +1,36 @@
-
 # 📡 EBYTE E32-433T20D LoRa Configuration Library for STM32
 
-A lightweight and modular C library for configuring the **EBYTE E32-433T20D LoRa module** using STM32 and HAL-based UART communication. This library provides full control over LoRa module settings such as address, channel, baud rate, air data rate, I/O mode, wake-up time, FEC, and transmission power.
+A lightweight and modular C library for configuring and communicating with the **EBYTE E32-433T20D LoRa module** using STM32 HAL-based UART.  
+The library provides:
+
+- Full runtime configuration of the module.
+- Send/receive any **user-defined struct** with optional addressing support.
+- Flexible **Fixed/Transparent Mode** communication.
 
 ---
 
 ## 🚀 Features
 
-- 🔌 UART-based configuration using STM32 HAL (`UART_HandleTypeDef`)
-- 📦 All parameters packed into a single struct (`LoraConfig_t`)
-- ✅ Clear and type-safe enums for better readability
-- 🛠️ Easy to integrate and use in embedded projects
-- 💡 Supports both runtime and one-time configuration modes
+- ✅ Fully configurable via `LoraConfig_t`
+- 📤 Supports sending any `struct` as payload
+- 📥 Flexible receive function with address header handling
+- 🧩 Easily integratable with STM32CubeMX HAL projects
+- ⚙️ Fixed Mode or Transparent Mode support
+- 🔒 Type-safe enum-based configuration
 
 ---
 
 ## 📁 File Structure
 
 ```
-├── lora_stm32.h     // Header file: Enums, struct, and function prototype
-├── lora_stm32.c     // Source file: Implementation of applyConfig function
-├── README.md        // This file
+├── lora_stm32.h     # Header file with enums, structs, and function prototypes
+├── lora_stm32.c     # Source file: full implementation
+├── README.md        # This file
 ```
 
 ---
 
-## 📐 LoraConfig_t Struct
+## 🧱 Configuration Struct
 
 ```c
 typedef struct {
@@ -45,87 +50,109 @@ typedef struct {
 } LoraConfig_t;
 ```
 
-All LoRa settings are wrapped inside this structure and sent to the module via `Lora_applyConfig()`.
-
----
-
-## 📚 Example Usage
+Set all LoRa module parameters with this struct using:
 
 ```c
-#include "lora_stm32.h"
-
-LoraConfig_t config = {
-    .ADDH = 0x00,
-    .ADDL = 0x01,
-    .CHAN = 0x17,
-
-    .serialPortMode = serialPortMode_8N1,
-    .baudRate = baudRate_9600,
-    .airRate = airRate_24K,
-
-    .transmissionMode = transmissionMode_Transparent,
-    .IODriveMode = IODriveMode_OpenCircuit,
-    .wakeUpTime = wakeUpTime_250ms,
-    .FECswitch = FECswitch_on,
-    .transmitPower = transmitPower_20dBm
-};
-
-Lora_applyConfig(&huart3, &config);  // Send configuration to LoRa module
+Lora_applyConfig(&huartX, &yourConfig);
 ```
 
-> 🔧 Ensure the module is in programming mode (M0 = HIGH, M1 = HIGH) before sending the configuration.
+---
+
+## 🔁 Packet Transfer API
+
+### Send Packet
+
+```c
+HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart,
+                                  uint8_t addh, uint8_t addl, uint8_t chan,
+                                  const void *payload, uint16_t payloadSize);
+```
+
+Prepends 3-byte header (`ADDH`, `ADDL`, `CHAN`) before sending your `payload`.
 
 ---
 
-## 🔧 API Reference
+### Receive Packet
 
-### `void Lora_applyConfig(UART_HandleTypeDef *huart, LoraConfig_t *config);`
+```c
+uint8_t* Lora_receivePacket(UART_HandleTypeDef *huart,
+                            uint8_t *addh, uint8_t *addl, uint8_t *chan,
+                            uint8_t *externalBuffer, uint16_t payloadSize,
+                            uint8_t isFixedMode);
+```
 
-- **@param** `huart`: Pointer to a configured UART handle
-- **@param** `config`: Pointer to a `LoraConfig_t` structure containing all desired parameters
-- **@brief** Sends the 6-byte configuration array to the LoRa module using `HAL_UART_Transmit`
+- In **Fixed Mode**: reads 3-byte header + payload, fills `addh`, `addl`, `chan`.
+- In **Transparent Mode**: only receives `payload`, sets `addh`, `addl`, `chan` to 0.
 
----
-
-## 🧱 Enum Definitions
-
-The following enums are used to define configuration options cleanly:
-
-- `serialPortMode_t`: UART data format (8N1, 801, 8E1)
-- `baudRate_t`: UART baud rate (1200 – 115200)
-- `airRate_t`: LoRa air data rate (0.3K – 192Kbps)
-- `transmissionMode_t`: Transparent or Fixed-point mode
-- `IODriveMode_t`: Push-pull or open-collector I/O
-- `wakeUpTime_t`: Wake-up delay (250ms – 2000ms)
-- `FECswitch_t`: Forward error correction (on/off)
-- `transmitPower_t`: Output power level (10 – 20 dBm)
+Returns pointer to payload buffer (`externalBuffer`) or `NULL` on error.
 
 ---
 
-## ✅ To-Do / Future Plans
+## 💡 Example Usage
 
-- Add GPIO control for M0/M1 mode selection
-- Support configuration reading (readback)
-- Add compatibility for E22 or SPI-based LoRa modules
+### Define your own payload struct
+
+```c
+typedef struct {
+    uint8_t id;
+    float temperature;
+    uint16_t voltage;
+} SensorData_t;
+```
+
+### Send data
+
+```c
+SensorData_t myData = { .id = 1, .temperature = 23.5f, .voltage = 3300 };
+Lora_sendPacket(&huart3, 0x00, 0x01, 0x17, &myData, sizeof(myData));
+```
+
+### Receive data
+
+```c
+SensorData_t received;
+uint8_t srcAddh, srcAddl, srcChan;
+
+uint8_t *result = Lora_receivePacket(&huart3, &srcAddh, &srcAddl, &srcChan,
+                                     (uint8_t*)&received, sizeof(received), 1);
+if (result != NULL) {
+    // Process received
+}
+```
+
+---
+
+## 🧰 Mode Tips
+
+| Mode           | Header Used | Use Case                    |
+|----------------|-------------|-----------------------------|
+| Transparent    | ❌ No        | Simple peer-to-peer         |
+| Fixed          | ✅ Yes       | Broadcast or multi-node     |
+
+Set using:
+
+```c
+.transmissionMode = transmissionMode_Transparent // or transmissionMode_Fixed
+```
 
 ---
 
 ## 🛠 Requirements
 
-- STM32 with HAL library enabled
-- UART interface connected to LoRa module
-- LoRa module placed in programming mode before applying config
-- Optional: GPIO access for M0 and M1 control
+- STM32 HAL Library
+- UART connected to LoRa module (E32-433T20D)
+- LoRa module in correct mode (Programming for config, Normal for use)
+- Optional: GPIO control for M0/M1
 
 ---
 
 ## 📃 License
 
-MIT License. Free to use, modify, and distribute.
+MIT License — Free to use, modify, and distribute.
 
 ---
 
-## ✨ Credits
+## ✨ Author
 
 Developed by **Efe BASOL**  
-Inspired by the EBYTE documentation and STM32 HAL UART usage.
+Based on EBYTE official documentation and HAL practice.
