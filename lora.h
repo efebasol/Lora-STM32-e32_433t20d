@@ -113,9 +113,7 @@ typedef struct
 
 HAL_StatusTypeDef Lora_applyConfig(UART_HandleTypeDef *huart, LoraConfig_t *config);
 HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart, uint8_t addh, uint8_t addl, uint8_t chan, const void *payload, uint16_t payloadSize);
-uint8_t *Lora_receivePacket(UART_HandleTypeDef *huart,
-                            uint8_t *addh, uint8_t *addl, uint8_t *chan,
-                            uint8_t *externalBuffer, uint16_t payloadSize,
-                            uint8_t isFixedMode);
+void Lora_onUartReceiveITComplete(void);
+void Lora_onUartReceiveIT(SensorData_t *data);
 
 #endif /* INC_LORA_STM32_H_ */

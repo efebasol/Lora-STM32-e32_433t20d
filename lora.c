@@ -11,7 +11,7 @@ HAL_StatusTypeDef Lora_applyConfig(UART_HandleTypeDef *huart, LoraConfig_t *conf
     mainParameter[4] = config->CHAN;
     mainParameter[5] = config->transmissionMode | config->IODriveMode | config->wakeUpTime | config->FECswitch | config->transmitPower;
 
-    HAL_StatusTypeDef result = HAL_UART_Transmit(huart, mainParameter, sizeof(mainParameter), HAL_MAX_DELAY);
+    HAL_StatusTypeDef result = HAL_UART_Transmit(huart, mainParameter, sizeof(mainParameter), 100);
     HAL_Delay(100);
     return result;
 }
@@ -29,41 +29,28 @@ HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart, uint8_t addh, uint8
 
     memcpy(&buffer[3], payload, payloadSize);
 
-    HAL_StatusTypeDef result = HAL_UART_Transmit(huart, buffer, totalSize, HAL_MAX_DELAY);
+    HAL_StatusTypeDef result = HAL_UART_Transmit(huart, buffer, totalSize, 100);
     HAL_Delay(100);
     return result;
 }
 
-uint8_t* Lora_receivePacket(UART_HandleTypeDef *huart,
-                            uint8_t *addh, uint8_t *addl, uint8_t *chan,
-                            uint8_t *externalBuffer, uint16_t payloadSize,
-                            uint8_t isFixedMode)
+void Lora_onUartReceiveITComplete(void)
 {
-    if (isFixedMode)
+    loraRxComplete = 1;
+}
+
+void Lora_onUartReceiveIT(SensorData_t *data)
+{
+    // Örnek işlem: sıcaklık belli aralıkta mı?
+    if (data->temperature > 30.0f)
     {
-        uint8_t buffer[256];
-
-        if ((3 + payloadSize) > sizeof(buffer))
-            return NULL;
-
-        if (HAL_UART_Receive(huart, buffer, 3 + payloadSize, HAL_MAX_DELAY) != HAL_OK)
-            return NULL;
-
-        if (addh) *addh = buffer[0];
-        if (addl) *addl = buffer[1];
-        if (chan) *chan = buffer[2];
-
-        memcpy(externalBuffer, &buffer[3], payloadSize);
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET); // LED2 yak
     }
     else
     {
-        if (HAL_UART_Receive(huart, externalBuffer, payloadSize, HAL_MAX_DELAY) != HAL_OK)
-            return NULL;
-
-        if (addh) *addh = 0;
-        if (addl) *addl = 0;
-        if (chan) *chan = 0;
+        HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
     }
 
-    return externalBuffer;
+    // Debug için UART'tan veri yazdırmak da mümkündür
+    // Örn: sprintf() ile huart3 üzerinden değer yazdırılabilir
 }
