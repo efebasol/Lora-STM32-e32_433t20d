@@ -8,7 +8,7 @@ typedef enum
 {
     // Default
     serialPortMode_8N1 = (0x00 << 0x06),
-    serialPortMode_8O1 = (0x01 << 0x06),
+    serialPortMode_801 = (0x01 << 0x06),
     serialPortMode_8E1 = (0x02 << 0x06)
 } serialPortMode_t;
 
@@ -82,7 +82,7 @@ typedef enum
     transmitPower_20dBm = (0x00 << 0x00),
     transmitPower_17dBm = (0x01 << 0x00),
     transmitPower_14dBm = (0x02 << 0x00),
-    transmitPower_10dBm = (0x03 << 0x00)
+    transmitPower_10dBm = (0x04 << 0x00)
 } transmitPower_t;
 
 typedef struct
@@ -115,7 +115,5 @@ HAL_StatusTypeDef Lora_applyConfig(UART_HandleTypeDef *huart, LoraConfig_t *conf
 HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart, uint8_t addh, uint8_t addl, uint8_t chan, const void *payload, uint16_t payloadSize);
 void Lora_onUartReceiveITComplete(void);
 void Lora_onUartReceiveIT(SensorData_t *data);
-
-
 
 #endif /* INC_LORA_STM32_H_ */
