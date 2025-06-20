@@ -116,4 +116,6 @@ HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart, uint8_t addh, uint8
 void Lora_onUartReceiveITComplete(void);
 void Lora_onUartReceiveIT(SensorData_t *data);
 
+
+
 #endif /* INC_LORA_STM32_H_ */
