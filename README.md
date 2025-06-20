@@ -5,7 +5,6 @@ The library provides:
 
 - Full runtime configuration of the module.
 - Send/receive any **user-defined struct** with optional addressing support.
-- Flexible **Fixed/Transparent Mode** communication.
 
 ---
 
@@ -13,9 +12,8 @@ The library provides:
 
 - ✅ Fully configurable via `LoraConfig_t`
 - 📤 Supports sending any `struct` as payload
-- 📥 Flexible receive function with address header handling
+- 📥 Interrupt-driven receive helper example
 - 🧩 Easily integratable with STM32CubeMX HAL projects
-- ⚙️ Fixed Mode or Transparent Mode support
 - 🔒 Type-safe enum-based configuration
 
 ---
@@ -69,25 +67,7 @@ HAL_StatusTypeDef Lora_sendPacket(UART_HandleTypeDef *huart,
 ```
 
 Prepends 3-byte header (`ADDH`, `ADDL`, `CHAN`) before sending your `payload`.
-
 ---
-
-### Receive Packet
-
-```c
-uint8_t* Lora_receivePacket(UART_HandleTypeDef *huart,
-                            uint8_t *addh, uint8_t *addl, uint8_t *chan,
-                            uint8_t *externalBuffer, uint16_t payloadSize,
-                            uint8_t isFixedMode);
-```
-
-- In **Fixed Mode**: reads 3-byte header + payload, fills `addh`, `addl`, `chan`.
-- In **Transparent Mode**: only receives `payload`, sets `addh`, `addl`, `chan` to 0.
-
-Returns pointer to payload buffer (`externalBuffer`) or `NULL` on error.
-
----
-
 ## 💡 Example Usage
 
 ### Define your own payload struct
@@ -107,35 +87,33 @@ SensorData_t myData = { .id = 1, .temperature = 23.5f, .voltage = 3300 };
 Lora_sendPacket(&huart3, 0x00, 0x01, 0x17, &myData, sizeof(myData));
 ```
 
-### Receive data
+
+### Receive data (UART interrupt)
 
 ```c
-SensorData_t received;
-uint8_t srcAddh, srcAddl, srcChan;
+volatile uint8_t loraRxComplete = 0;
+SensorData_t received = {0};
 
-uint8_t *result = Lora_receivePacket(&huart3, &srcAddh, &srcAddl, &srcChan,
-                                     (uint8_t*)&received, sizeof(received), 1);
-if (result != NULL) {
-    // Process received
+HAL_UART_Receive_IT(&huart6, (uint8_t*)&received, sizeof(received));
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    Lora_onUartReceiveITComplete();
+}
+
+while (1)
+{
+    if (loraRxComplete)
+    {
+        loraRxComplete = 0;
+        Lora_onUartReceiveIT(&received);
+        HAL_UART_Receive_IT(&huart6, (uint8_t*)&received, sizeof(received));
+    }
 }
 ```
 
 ---
 
-## 🧰 Mode Tips
-
-| Mode           | Header Used | Use Case                    |
-|----------------|-------------|-----------------------------|
-| Transparent    | ❌ No        | Simple peer-to-peer         |
-| Fixed          | ✅ Yes       | Broadcast or multi-node     |
-
-Set using:
-
-```c
-.transmissionMode = transmissionMode_Transparent // or transmissionMode_Fixed
-```
-
----
 
 ## 🛠 Requirements
 
